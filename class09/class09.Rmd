@@ -1,0 +1,179 @@
+---
+title: "class09"
+author: "Joshua Chevez"
+date: "February 8, 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Workshop: Cancer Cells
+
+```{r}
+fna.data <- "WisconsinCancer.csv"
+read.csv(fna.data)
+wisc.df <- read.csv(fna.data)
+```
+
+```{r}
+head(wisc.df)
+```
+
+Note: last column x (all NA)
+Check how many patients/measured variables
+```{r}
+#number of patients
+nrow(wisc.df)
+```
+
+```{r}
+#number of columns
+ncol(wisc.df)
+```
+
+take columns 3 to 32
+```{r}
+wisc.data <- wisc.df[ , 3:32]
+head(wisc.data)
+```
+
+
+set row names to patient ID numbers
+
+```{r}
+row.names(wisc.data) <- wisc.df$id
+head(wisc.data)
+```
+
+How many malignant vs benign
+
+```{r}
+table(wisc.df$diagnosis)
+```
+
+How many features are "_mean" values
+```{r}
+colnames(wisc.data)
+length(grep("_mean", colnames(wisc.data)))
+```
+
+```{r}
+inds <- grep("_mean", colnames(wisc.data))
+colnames(wisc.data)[inds]
+```
+
+#PC analysis
+
+
+```{r}
+colMeans(wisc.data)
+```
+
+Mean of every column (2) in the data
+```{r}
+round(apply(wisc.data,2,mean), 2)
+```
+
+Standard deviation of every column
+```{r}
+round(apply(wisc.data,2,sd), 2)
+```
+#PCA
+Different so needs to be scaled
+
+```{r}
+wisc.pr <- prcomp(wisc.data, scale. = TRUE)
+summary(wisc.pr)
+biplot(wisc.pr)
+#biplot doesn't help
+
+
+```
+
+Make a useful plot; Each dot represents a patient.
+```{r}
+plot(wisc.pr$x[, 1], wisc.pr$x[, 2])
+```
+
+
+Lets color in the diagnosis; malignant in red (black is the first color for the first level, red is the default color for the second vector)
+```{r}
+wisc.df$diagnosis
+plot(wisc.pr$x[, 1], wisc.pr$x[, 2], col = wisc.df$diagnosis)
+```
+
+Scree plot; Variance = sdev^2; total variance = sum(variance)
+```{r}
+variance <- wisc.pr$sdev^2
+variance
+pve <- round((variance/sum(variance)) * 100, 2)
+```
+
+```{r}
+plot(pve, type = "o")
+```
+
+Barplot; remove and add an axis and add values
+```{r}
+barplot(pve, axes = FALSE, names.arg = paste("PC", 1:length(pve)), las = 2, ylab = "Proportion of Variance (%)")
+axis(2, round(pve))
+```
+
+#Clustering using ward.d2 heirarchial clustering for our PCA
+
+For hclust we need a distance matrix from our PCA results (wisc.pr$x)
+```{r}
+d <- dist(wisc.pr$x[, 1:2])
+hc <- hclust(d, method = "ward.D2")
+plot(hc)
+```
+
+Cut our tree into 3 groups
+
+```{r}
+grp3 <- cutree(hc, k = 3)
+table(grp3)
+```
+
+Our PCA plot colored by cluster
+```{r}
+plot(wisc.pr$x[, 1], wisc.pr$x[, 2], xlab = "PC1", ylab = "PC2", col = grp3)
+```
+
+Cross tabulation
+```{r}
+diagnosis <- wisc.df$diagnosis == "M"
+table(grp3, diagnosis)
+```
+
+Same thing:
+```{r}
+table(grp3, wisc.df$diagnosis)
+```
+
+```{r}
+new <- read.csv("new_samples.csv")
+npc <- predict(wisc.pr, newdata=new)
+npc
+```
+
+```{r}
+plot(wisc.pr$x[, 1:2], col=wisc.df$diagnosis)
+points(npc[, 1], npc[, 2], col = c("green", "blue"), pch = 15, cex = 3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
