@@ -1,0 +1,146 @@
+---
+title: "Class_11"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Class 11
+
+
+```{r}
+stats <- read.csv("Data Export Summary.csv", row.names = 1)
+stats
+```
+
+
+Q1
+```{r}
+pre.by.method <- stats$Total/sum(stats$Total) * 100
+names(pre.by.method) <- row.names(stats)
+pre.by.method
+```
+
+
+Q2 What proportion of structures are protein
+```{r}
+total <- sum(stats$Total)
+total.p <- sum(stats$Proteins)
+total.p/total
+```
+
+Datapasta
+```{r}
+tmp <- data.frame(stringsAsFactors=FALSE,
+   Experimental.Method = c("X-Ray", "NMR", "Electron Microscopy", "Other",
+                           "Multi Method", "Total"),
+              Proteins = c(124770, 10988, 2057, 250, 127, 138192),
+         Nucleic.Acids = c(1993, 1273, 31, 4, 5, 3306),
+    ProteinNA.Complex = c(6451, 257, 723, 6, 2, 7439),
+                 Other = c(10, 8, 0, 13, 1, 32),
+                 Total = c(133224, 12526, 2811, 273, 135, 148969)
+)
+
+```
+
+## Bio3D
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+pdb <- read.pdb("1hsg")
+pdb
+```
+
+##Does not work on pc
+```{r}
+# The 'devtools' package allows us to install development versions
+#install.packages("devtools")
+# Install the bio3d.view package from bitbucket
+devtools::install_bitbucket("Grantlab/bio3d-view")
+
+```
+
+
+```{r}
+library("bio3d.view")
+#(pdb, "overview", col = "sse")
+```
+
+
+
+#Extract the protein only portion of this PDB structure and write it out to a new PDB file.
+
+Extract the ligand (i.e. drug)
+```{r}
+ca.inds <- atom.select(pdb, "calpha")
+ca.inds
+```
+
+```{r}
+# Print details of the first few selected atoms
+head( pdb$atom[ca.inds$atom, ] )
+```
+
+
+```{r}
+write.pdb(pdb, "pdb_protein only")
+```
+
+
+```{r}
+inds <- atom.select(pdb, "ligand")
+inds
+```
+
+
+```{r}
+inds$atom
+pdb$atom[inds$atom, 1:5]
+```
+
+
+```{r}
+ligand.pdb <- trim.pdb(pdb, inds)
+ligand.pdb
+```
+
+```{r}
+write.pdb(ligand.pdb, file = "ligand.pdb")
+```
+
+
+#normal mode analysis
+
+```{r}
+pdb.1 <- read.pdb("1YAT")
+#Normal Mode Analysis
+modes <- nma(pdb.1)
+plot(modes)
+m7 <- mktrj(modes,
+ mode=7,
+ file="mode_7.pdb")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
