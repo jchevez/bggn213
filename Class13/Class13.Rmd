@@ -1,0 +1,97 @@
+---
+title: "Class13"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Variant Data
+
+```{r}
+mxl <- read.csv("Variant Data.csv", row.names = 1)
+```
+
+
+
+```{r}
+data.class(mxl)
+head(mxl)
+```
+
+```{r}
+mxl$Genotype..forward.strand.
+table(mxl)
+```
+
+
+```{r}
+table(mxl$Genotype..forward.strand.) / nrow(mxl) * 100
+```
+
+```{r}
+#install.packages("seqinr")
+#install.packages("gtools")
+library(seqinr)
+library(gtools)
+chars <- s2c("DDDDCDEDCDDDDBBDDDCC@")
+chars
+phred <- asc(chars) - 33
+phred
+```
+
+
+
+```{r}
+expr <- read.table("RNA_seq_final_file_section_4.txt")
+head(expr)
+```
+
+
+
+```{r}
+table(expr$geno)
+```
+
+```{r}
+inds.gg <- expr$geno == "G/G"
+summary(expr[inds.gg, "exp"])
+```
+
+
+```{r}
+inds.ag <- expr$geno == "A/G"
+summary(expr[inds.ag, "exp"])
+```
+
+```{r}
+inds.aa <- expr$geno == "A/A"
+summary(expr[inds.aa, "exp"])
+```
+
+```{r}
+boxplot(exp ~ geno, data = expr, notch=TRUE)
+```
+
+
+```{r}
+# Boxplot with the data shown
+library(ggplot2)
+ggplot(expr, aes(geno, exp, fill=geno)) + 
+  geom_boxplot(notch=TRUE, outlier.shape = NA) + 
+  geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.4)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
