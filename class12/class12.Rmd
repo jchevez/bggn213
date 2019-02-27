@@ -1,0 +1,101 @@
+---
+title: "Untitled"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(bio3d)
+```
+
+
+Download structure from pdb database "1hsg"
+get.pbd gets the file and puts it into the working directory
+
+Name pdb code so that it is easily changable
+```{r}
+pdb.code <- "1hsg"
+file.name <- get.pdb(pdb.code)
+
+```
+
+Extract the protein only segment of the pdb entry and write out new pdb format file. Do the same for the bound ligand
+
+
+```{r}
+hiv <- read.pdb(file.name)
+hiv
+```
+
+Protein extraction
+
+```{r}
+prot <- trim.pdb(hiv, "protein")
+prot
+```
+Make any name up for file (not hard coded and can be easily changed)
+
+```{r}
+prot.filename <- paste(pdb.code, "_protein.pdb", sep = "")
+write.pdb(prot, file = prot.filename)
+```
+
+
+
+Same thing for ligand
+
+```{r}
+lig <- trim.pdb(hiv, "ligand")
+write.pdb(lig, file = paste(pdb.code, "_ligand.pdb", sep = ""))
+```
+
+```{r}
+lig
+```
+
+##Convert docking results for viewing in VMD
+14 models (answers)
+
+```{r}
+res <- read.pdb("all.pdbqt", multi=TRUE)
+write.pdb(res, "results.pdb")
+```
+
+
+Calculating distance/similarity
+```{r}
+# res <- read.pdb("all.pdbqt", multi=TRUE)
+ori <- read.pdb("ligand.pdbqt")
+rmsd(ori, res)
+```
+
+#Hen egg white lysozyme
+```{r}
+library(bio3d)
+pdb <- read.pdb("1HEL")
+modes <- nma(pdb)
+plot(modes, sse=pdb)
+```
+
+```{r}
+mktrj(modes, mode=7, file="nma_7.pdb")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
