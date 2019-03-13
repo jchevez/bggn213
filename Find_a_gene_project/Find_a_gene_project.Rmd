@@ -1,0 +1,79 @@
+---
+title: "Find a gene project"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(bio3d)
+```
+#Q7
+
+```{r}
+almt <- read.fasta("MEGA Alignment FASTA Format.fas")
+```
+
+
+```{r}
+sim <- seqidentity(almt)
+```
+
+```{r}
+heatmap(sim, margins = c(11, 4))
+```
+
+#Q8
+
+
+```{r}
+cs <- consensus(almt)
+cs_seq <- cs$seq
+cs_seq
+```
+
+
+```{r}
+bhts <- blast.pdb(cs_seq)
+```
+
+```{r}
+bhts
+```
+
+
+```{r}
+plot.blast(bhts)
+```
+
+
+
+```{r}
+top3 <- pdb.annotate(c("4LDQ_A", "2A0U_A", "1T9K_A"), anno.terms = c("structureId", "experimentalTechnique", "resolution", "source"))
+top3
+```
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
